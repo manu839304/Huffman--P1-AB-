@@ -68,18 +68,26 @@ void construir_arbol(unordered_map<char, int> map_freq){
     
     // Declaramos las variables 
     tree<pair<int, char>> arbol_x, arbol_y, arbol_z;
-    pair<int,char> par_1, par_2;
-    int new_second;
+    pair<int,char> par_1, par_2, new_par;
+
+    new_par.first = 0;
 
     for(int i = 0; i < map_freq.size() - 1; i++){
         par_1 = pq_freq.top();
         pq_freq.pop();
+        arbol_x.insert(par_1);
+
         par_2 = pq_freq.top();
         pq_freq.pop();
+        arbol_y.insert(par_2);
 
-        new_second = par_1.second + par_2.second;
+        new_par.second = par_1.second + par_2.second;
         
-        //NOS HEMOS QUEDADO EN Z:= CREAARBOL...
+        arbol_z.insert(new_par);
+        arbol_z.root().insert(par_1);
+        arbol_z.root().insert(par_2);
+
+        //FALTA ACABAR ALGORITMO CON LOS ARBOLES ETC
     }
 }
 
