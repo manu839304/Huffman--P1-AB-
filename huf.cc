@@ -61,22 +61,54 @@ priority_queue<pair<char, int>, vector<pair<char, int> >, ComparePairs> crear_co
    return pq_freq;
 }
 
+int encontrar_indice_nodo(pair<char, int> pareja, Node* nodos[], int ultimo_nodo){
+    for(int i = 0; i < ultimo_nodo; i++){
+        if( nodos[i]->data.first == pareja.first && nodos[i]->data.second == pareja.second){
+            return i;
+        }
+    }
+    return -1;
+}
+
+void construir_nuevo_nodo(pair<char, int> par_izq, pair<char, int> par_dch, Node* nodos[], int indice_raiz){
+    // Buscamos e insertamos hijo izquierdo
+    int indice_hijo = encontrar_indice_nodo(par_izq, nodos, indice_raiz);
+    if(indice_hijo < 0){
+        cout << "ERROR: Nodo <" << par_izq.first << "," << par_izq.second << "> no encontrado.";
+    } else {
+        nodos[indice_raiz]->left = nodos[indice_hijo];
+        //cout << "Hijo izquierdo de " << nodos[indice_raiz]->data.first << "," << par_izq.second << "> no encontrado."
+    }
+
+    // Buscamos e insertamos hijo derecho
+    indice_hijo = encontrar_indice_nodo(par_dch, nodos, indice_raiz);
+    if(indice_hijo < 0){
+        cout << "ERROR: Nodo <" << par_dch.first << "," << par_dch.second << "> no encontrado.";
+    } else {
+        nodos[indice_raiz]->right = nodos[indice_hijo];
+    }
+}
+
+void print_arbol(Node* nodos[], int nodo_actual, int num_it){
+    cout << "--- ITERACION " << num_it << " ---\n";
+    Printtree(nodos[nodo_actual], 0);
+}
+
 
 void construir_arbol(unordered_map<char, int> map_freq){
 
     // Construimos la cola de prioridad de parejas de los caracteres y su frecuencia de aparición
     priority_queue<pair<char, int>, vector<pair<char, int>>, ComparePairs> pq_freq = crear_cola_prio(map_freq);
-    
-    // Declaramos las variables 
-    tree<pair<char, int>> arboles[map_freq.size() - 1];
-    typedef tree<pair<char, int>>::iterator iterator;
-    typedef tree<pair<char, int>>::node_type node_type;
-    //struct Node* nodo_x;
-    //struct Node* nodo_y;
-    //struct Node* nodo_z;
-    pair<char,int> par_1, par_2, new_par;
+    struct Node* nodos[(map_freq.size() * 2) -1];
+    int nodo_actual = 0, indice = 0;
 
-    
+    for (auto& pareja : map_freq) {
+        // Incluimos el valor del mapa a la cola de prioridades
+        nodos[nodo_actual] = new Node(pareja);
+        nodo_actual++;
+    }
+
+    pair<char,int> par_1, par_2, new_par;
 
     new_par.first = '-';
 
@@ -89,26 +121,17 @@ void construir_arbol(unordered_map<char, int> map_freq){
         pq_freq.pop();
 
         new_par.second = par_1.second + par_2.second;
-        
-        arboles[i].insert(new_par);
-        arboles[i].root().insert(par_1);
-        arboles[i].root().insert(par_2);
+
+        nodos[nodo_actual] = new Node(new_par);
+        construir_nuevo_nodo(par_1, par_2, nodos, nodo_actual);
+        print_arbol(nodos, nodo_actual, i+1);
+        cout << "\n";
+
+        nodo_actual++;
 
         pq_freq.push(new_par);
-        
-        iterator F = arboles[i].begin();
-        iterator L = arboles[i].end();
-        cout << "ITERACION " << i+1 << " || Arbol z: ";
-        for (iterator j(F);  j != L;  ++j) {
-            cout << j->data().first << ":" << j->data().second << " ";
-        }
-        cout << " || Nodos: x-" << arboles[i].size() << ", y-" << arboles[i].size() << ", z-" << arboles[i].size();
-        cout << "\n";
-       
-        //FALTA HACER QUE LOS NODOS NO DESAPAREZCAN
     }
 }
-
 
 
 void comprimir(ifstream &fichero){
