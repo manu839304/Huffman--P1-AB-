@@ -3,9 +3,8 @@
 #include <cstdio>     // Para printf
 #include <iostream>
 #include "arbol.hh"
-#include "trees/include/st_tree.h"
 
-using namespace st_tree;
+using namespace std;
 
 unordered_map<char, int> contar_caracteres(ifstream &fichero) {
     unordered_map<char, int> map_freq;
