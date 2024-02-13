@@ -88,17 +88,16 @@ void construir_nuevo_nodo(pair<char, int> par_izq, pair<char, int> par_dch, Node
     }
 }
 
-void print_arbol(Node* nodos[], int nodo_actual, int num_it){
+void print_arbol(Node* nodo, int num_it){
     cout << "--- ITERACION " << num_it << " ---\n";
-    Printtree(nodos[nodo_actual], 0);
+    Printtree(nodo, 0);
 }
 
 
-void construir_arbol(unordered_map<char, int> map_freq){
+Node* construir_arbol(unordered_map<char, int> map_freq, Node* nodos[]){
 
     // Construimos la cola de prioridad de parejas de los caracteres y su frecuencia de aparición
     priority_queue<pair<char, int>, vector<pair<char, int>>, ComparePairs> pq_freq = crear_cola_prio(map_freq);
-    struct Node* nodos[(map_freq.size() * 2) -1];
     int nodo_actual = 0, indice = 0;
 
     for (auto& pareja : map_freq) {
@@ -123,8 +122,11 @@ void construir_arbol(unordered_map<char, int> map_freq){
 
         nodos[nodo_actual] = new Node(new_par);
         construir_nuevo_nodo(par_1, par_2, nodos, nodo_actual);
-        print_arbol(nodos, nodo_actual, i+1);
+        /*
+        cout << "---- Nodo actual: " << nodo_actual << " ----\n";
+        print_arbol(nodos[nodo_actual], i+1);
         cout << "\n";
+        */
 
         nodo_actual++;
 
@@ -132,13 +134,31 @@ void construir_arbol(unordered_map<char, int> map_freq){
     }
 }
 
+void asignar_codigos(Node* arbol){
+    if(arbol->left != NULL){
+        arbol->left->data.second = 0;
+        asignar_codigos(arbol->left);
+    }
+
+    if(arbol->right != NULL){
+        arbol->right->data.second = 1;
+        asignar_codigos(arbol->right);
+    }
+
+}
+
 
 void comprimir(ifstream &fichero){
     
     // Obtenemos la cola de prioridad de caracteres y su frecuencia de aparición
     unordered_map<char, int> frecuencia = contar_caracteres(fichero);
-    construir_arbol(frecuencia);
-    // construir arbol (y asignar codigos a caracteres)
+    int num_arboles = (frecuencia.size() * 2)-1;
+    Node* nodos[num_arboles];
+    construir_arbol(frecuencia, nodos);
+    Node* arbol = nodos[num_arboles-1];
+    asignar_codigos(arbol);
+    Printtree(arbol, 0);
+    // asignar codigos a caracteres
     // escribir fichero (diccionario de codigos + el texto codificado)
 
     // input = archivo original

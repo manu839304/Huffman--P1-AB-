@@ -45,6 +45,7 @@ void Printtree(struct Node *root, int tab)
     for(int i = 0; i < tab; i++){
         cout << "\t";
     }
+
     cout << "Izquierda: ";
     if(root->left != NULL){
         cout << "\n";
@@ -52,10 +53,12 @@ void Printtree(struct Node *root, int tab)
     } else {
         cout << "NULL";
     }
+    
     cout << "\n";
     for(int i = 0; i < tab; i++){
         cout << "\t";
     }
+
     cout << "Derecha: ";
     if(root->right != NULL){
         cout << "\n";
@@ -63,5 +66,4 @@ void Printtree(struct Node *root, int tab)
     } else {
         cout << "NULL";
     }
-    cout << "\n";
 }
