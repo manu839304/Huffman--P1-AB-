@@ -18,10 +18,8 @@ struct ComparePairs {
 
 void comprimir(ifstream &fichero);
 
-unordered_map<char, int> 
-contar_caracteres(ifstream &fichero);
+unordered_map<char, int> contar_caracteres(ifstream &fichero);
 
-priority_queue<pair<char, int>, vector<pair<char, int>>, ComparePairs> 
-crear_cola_prio(unordered_map<char, int> map_freq);
+priority_queue<pair<char, int>, vector<pair<char, int> >, ComparePairs> crear_cola_prio(unordered_map<char, int> map_freq);
 
 void descomprimir(ifstream &fichero);
