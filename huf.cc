@@ -2,24 +2,26 @@
 #include <stdlib.h>
 #include <cstdio>     // Para printf
 #include <iostream>
+#include <string>
 #include "arbol.hh"
 
 using namespace std;
 
-unordered_map<char, int> contar_caracteres(ifstream &fichero) {
-    unordered_map<char, int> map_freq;
+unordered_map<string, int> contar_caracteres(ifstream &fichero) {
+    unordered_map<string, int> map_freq;
     char char_leido;
+    string string_leido;
 
     while (fichero.get(char_leido)) {
-        
+        string_leido = char_leido;
         // Si el mapa no contiene el caracter, asigna su valor de aparición en 1
-        if (map_freq.find(char_leido) == map_freq.end()) {
-            map_freq[char_leido] = 1;
+        if (map_freq.find(string_leido) == map_freq.end()) {
+            map_freq[string_leido] = 1;
         }
  
         // Sino, aumenta su frecuencia
         else {
-            map_freq[char_leido]++;
+            map_freq[string_leido]++;
         }
     }
 
@@ -35,9 +37,9 @@ unordered_map<char, int> contar_caracteres(ifstream &fichero) {
 }
 
 
-priority_queue<pair<char, int>, vector<pair<char, int> >, ComparePairs> crear_cola_prio(unordered_map<char, int> map_freq){
+priority_queue<pair<string, int>, vector<pair<string, int> >, ComparePairs> crear_cola_prio(unordered_map<string, int> map_freq){
     // Declaramos cola de prioridades
-    priority_queue<pair<char, int>, vector<pair<char, int>>, ComparePairs> pq_freq;
+    priority_queue<pair<string, int>, vector<pair<string, int>>, ComparePairs> pq_freq;
 
     for (auto& pareja : map_freq) {
         // Inlcuimos el valor del mapa a la cola de prioridades
@@ -60,20 +62,20 @@ priority_queue<pair<char, int>, vector<pair<char, int> >, ComparePairs> crear_co
    return pq_freq;
 }
 
-int encontrar_indice_nodo(pair<char, int> pareja, Node* nodos[], int ultimo_nodo){
+int encontrar_indice_nodo(pair<string, int> pareja, Node* nodos[], int ultimo_nodo){
     for(int i = 0; i < ultimo_nodo; i++){
-        if( nodos[i]->data.first == pareja.first && nodos[i]->data.second == pareja.second){
+        if(nodos[i]->data.first == pareja.first && nodos[i]->data.second == pareja.second){
             return i;
         }
     }
     return -1;
 }
 
-void construir_nuevo_nodo(pair<char, int> par_izq, pair<char, int> par_dch, Node* nodos[], int indice_raiz){
+void construir_nuevo_nodo(pair<string, int> par_izq, pair<string, int> par_dch, Node* nodos[], int indice_raiz){
     // Buscamos e insertamos hijo izquierdo
     int indice_hijo = encontrar_indice_nodo(par_izq, nodos, indice_raiz);
     if(indice_hijo < 0){
-        cout << "ERROR: Nodo <" << par_izq.first << "," << par_izq.second << "> no encontrado.";
+        cout << "ERROR: Nodo <" << par_izq.first << "," << par_izq.second << "> no encontrado.\n";
     } else {
         nodos[indice_raiz]->left = nodos[indice_hijo];
         //cout << "Hijo izquierdo de " << nodos[indice_raiz]->data.first << "," << par_izq.second << "> no encontrado."
@@ -94,10 +96,10 @@ void print_arbol(Node* nodo, int num_it){
 }
 
 
-Node* construir_arbol(unordered_map<char, int> map_freq, Node* nodos[]){
+Node* construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
 
     // Construimos la cola de prioridad de parejas de los caracteres y su frecuencia de aparición
-    priority_queue<pair<char, int>, vector<pair<char, int>>, ComparePairs> pq_freq = crear_cola_prio(map_freq);
+    priority_queue<pair<string, int>, vector<pair<string, int>>, ComparePairs> pq_freq = crear_cola_prio(map_freq);
     int nodo_actual = 0, indice = 0;
 
     for (auto& pareja : map_freq) {
@@ -106,9 +108,9 @@ Node* construir_arbol(unordered_map<char, int> map_freq, Node* nodos[]){
         nodo_actual++;
     }
 
-    pair<char,int> par_1, par_2, new_par;
+    pair<string,int> par_1, par_2, new_par;
 
-    new_par.first = '-';
+    new_par.first = "NULL";
 
     for(int i = 0; i < map_freq.size() - 1; i++){
 
@@ -134,31 +136,73 @@ Node* construir_arbol(unordered_map<char, int> map_freq, Node* nodos[]){
     }
 }
 
-void asignar_codigos(Node* arbol){
+void asignar_ceros_y_unos(Node* arbol){
     if(arbol->left != NULL){
         arbol->left->data.second = 0;
-        asignar_codigos(arbol->left);
+        asignar_ceros_y_unos(arbol->left);
     }
 
     if(arbol->right != NULL){
         arbol->right->data.second = 1;
-        asignar_codigos(arbol->right);
+        asignar_ceros_y_unos(arbol->right);
     }
 
 }
+
+string recoger_codigo(Node* arbol, string* caracter){
+    string codigo;
+    int bit;
+    cout << "Nodo: " << arbol->data.first << "," << arbol->data.second << "\n";
+    
+
+    if(arbol->data.first != "NULL"){
+        *caracter = arbol->data.first;
+        cout << "ANULADO " << *caracter << "\n";
+        arbol = NULL;
+        return codigo;
+
+    } else if(arbol->left != NULL){
+        codigo += arbol->left->data.second + '0';
+        codigo += recoger_codigo(arbol->left, caracter);
+        cout << "Codigo: " << codigo << "\n";
+    } else if (arbol->right != NULL) {
+        codigo += arbol->right->data.second + '0';
+        codigo += recoger_codigo(arbol->right, caracter);
+        cout << "Codigo: " << codigo << "\n";
+    } else {
+        arbol = NULL;
+    }
+}
+
+
+void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, string> codigos){
+    string caracter, codigo;
+    cout << "Num caracteres: " << num_caracteres << "\n";
+    for(int i = 0; i < num_caracteres; i++){
+        codigo = recoger_codigo(arbol, &caracter);
+        cout << caracter << ":" << codigo << "\n";
+    }
+}
+
 
 
 void comprimir(ifstream &fichero){
     
     // Obtenemos la cola de prioridad de caracteres y su frecuencia de aparición
-    unordered_map<char, int> frecuencia = contar_caracteres(fichero);
-    int num_arboles = (frecuencia.size() * 2)-1;
+    unordered_map<string, int> frecuencia = contar_caracteres(fichero);
+    int num_caracteres = frecuencia.size();
+    int num_arboles = (num_caracteres * 2)-1;
+
     Node* nodos[num_arboles];
     construir_arbol(frecuencia, nodos);
-    Node* arbol = nodos[num_arboles-1];
-    asignar_codigos(arbol);
-    Printtree(arbol, 0);
-    // asignar codigos a caracteres
+
+    Node* arbol = nodos[num_arboles-1]; // le pasamos el ultimo nodo raiz, que corresponde al arbol 'final' (ultima iteracion)
+    asignar_ceros_y_unos(arbol);
+
+    unordered_map<string, string> codigos;
+    asignar_codigos(arbol, num_caracteres, codigos);
+    // Printtree(arbol, 0);
+    
     // escribir fichero (diccionario de codigos + el texto codificado)
 
     // input = archivo original

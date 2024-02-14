@@ -7,14 +7,14 @@ using namespace std;
 
 struct Node {
 
-    pair<char,int> data;
+    pair<string,int> data;
     struct Node* left;
     struct Node* right;
 
     // A constructor to the struct node
     // that inserts value in the data variable.
 
-    Node(pair<char,int> value)
+    Node(pair<string,int> value)
     {
         data = value;
         left = NULL;//Left child is initialized to NULL

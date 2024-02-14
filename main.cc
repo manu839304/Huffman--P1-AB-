@@ -2,7 +2,7 @@
 
 int main()
 {
-    pair<int,char> par, par2, par3;
+    pair<string, int> par, par2, par3;
     par.first = 1;
     par.second = 'a';
     par2.first = 2;
@@ -13,5 +13,5 @@ int main()
     struct Node* root = new Node(par);
     root->left = new Node(par2);//inserting 2 to the left of root
     root->right = new Node(par3);//Inserting 3 to the right of root
-    Printtree(root);
+    Printtree(root, 0);
 }
