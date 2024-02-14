@@ -19,17 +19,18 @@ unordered_map<string, int> contar_caracteres(string fich) {
     if(fichero.is_open()){
         while (fichero.get(char_leido)) {
             string_leido = char_leido;
-            // Si el mapa no contiene el caracter, asigna su valor de aparición en 1
-            if (map_freq.find(string_leido) == map_freq.end()) {
-                map_freq[string_leido] = 1;
-            }
-    
-            // Sino, aumenta su frecuencia
-            else {
-                map_freq[string_leido]++;
+            if (string_leido != "\n"){ // Evitará codificar el salto de linea
+                // Si el mapa no contiene el caracter, asigna su valor de aparición en 1
+                if (map_freq.find(string_leido) == map_freq.end()) {
+                    map_freq[string_leido] = 1;
+                }
+        
+                // Sino, aumenta su frecuencia
+                else {
+                    map_freq[string_leido]++;
+                }
             }
         }
-
         // MOSTRAR FRECUENCIAS NO ORDENADAS
         /*
         for (auto& it : map_freq) {
@@ -115,7 +116,7 @@ void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
 
     for (auto& pareja : map_freq) {
         nodos[nodo_actual] = new Node(pareja);
-        cout << "Se ha anadido: " << nodos[nodo_actual]->data.first << "," << nodos[nodo_actual]->data.second << " con indice: " << nodo_actual << endl; // para depurar
+        //cout << "Se ha anadido: " << nodos[nodo_actual]->data.first << "," << nodos[nodo_actual]->data.second << " con indice: " << nodo_actual << endl; // para depurar
         nodo_actual++;
     }
 
@@ -126,12 +127,12 @@ void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
         if (!pq_freq.empty()){
             par_1 = pq_freq.top();
             pq_freq.pop();
-            cout << "Se ha sacado: " << par_1.first << "," << par_1.second << " de la cola prio" << endl; // para depurar
+            //cout << "Se ha sacado: " << par_1.first << "," << par_1.second << " de la cola prio" << endl; // para depurar
 
 
             par_2 = pq_freq.top();
             pq_freq.pop();
-            cout << "Se ha sacado: " << par_2.first << "," << par_2.second << " de la cola prio" << endl; // para depurar
+            //cout << "Se ha sacado: " << par_2.first << "," << par_2.second << " de la cola prio" << endl; // para depurar
             
             new_par.first = par_1.first + "+" + par_2.first;
         }
@@ -139,13 +140,13 @@ void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
         new_par.second = par_1.second + par_2.second;
 
         nodos[nodo_actual] = new Node(new_par);
-        cout << "Se ha anadido: " << nodos[nodo_actual]->data.first << "," << nodos[nodo_actual]->data.second << " con indice: " << nodo_actual << endl; // para depurar
+        //cout << "Se ha anadido: " << nodos[nodo_actual]->data.first << "," << nodos[nodo_actual]->data.second << " con indice: " << nodo_actual << endl; // para depurar
         construir_nuevo_nodo(par_1, par_2, nodos, nodo_actual);
-        
+        /*
         cout << "---- Nodo actual: " << nodo_actual << " ----\n";
         print_arbol(nodos[nodo_actual], i+1);
         cout << "\n";
-    
+        */
         nodo_actual++;
 
         pq_freq.push(new_par);
@@ -230,7 +231,6 @@ void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codig
     else{
 
         // Para cambiar la extensión de fichero si es que tiene alguna.
-        cout << fichero << endl;
         string delimiter = ".";
         string token = fichero.substr(0, fichero.find_last_of(delimiter));
         string fichero_out = token + ".huf";
@@ -282,7 +282,7 @@ void comprimir(string fichero){
     
 
     // escribir fichero (diccionario de codigos + el texto codificado)
-    //escribirFicheroHuffman(fichero, codigos);
+    escribirFicheroHuffman(fichero, codigos);
 }
 
 
