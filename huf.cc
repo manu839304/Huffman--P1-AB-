@@ -7,32 +7,42 @@
 
 using namespace std;
 
-unordered_map<string, int> contar_caracteres(ifstream &fichero) {
+unordered_map<string, int> contar_caracteres(string fich) {
+
+    ifstream fichero;
+    fichero.open(fich);
+
     unordered_map<string, int> map_freq;
     char char_leido;
     string string_leido;
 
-    while (fichero.get(char_leido)) {
-        string_leido = char_leido;
-        // Si el mapa no contiene el caracter, asigna su valor de aparición en 1
-        if (map_freq.find(string_leido) == map_freq.end()) {
-            map_freq[string_leido] = 1;
+    if(fichero.is_open()){
+        while (fichero.get(char_leido)) {
+            string_leido = char_leido;
+            // Si el mapa no contiene el caracter, asigna su valor de aparición en 1
+            if (map_freq.find(string_leido) == map_freq.end()) {
+                map_freq[string_leido] = 1;
+            }
+    
+            // Sino, aumenta su frecuencia
+            else {
+                map_freq[string_leido]++;
+            }
         }
- 
-        // Sino, aumenta su frecuencia
-        else {
-            map_freq[string_leido]++;
+
+        // MOSTRAR FRECUENCIAS NO ORDENADAS
+        /*
+        for (auto& it : frecuencia) {
+            cout << it.first << ' '
+                << it.second << '\n';
         }
-    }
+        */
 
-    // MOSTRAR FRECUENCIAS NO ORDENADAS
-    /*
-    for (auto& it : frecuencia) {
-        cout << it.first << ' '
-             << it.second << '\n';
+        fichero.close();
     }
-    */
-
+    else{
+        printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su lectura", fich);
+    }
     return map_freq;
 }
 
@@ -96,15 +106,15 @@ void print_arbol(Node* nodo, int num_it){
 }
 
 
-Node* construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
+void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
 
     // Construimos la cola de prioridad de parejas de los caracteres y su frecuencia de aparición
     priority_queue<pair<string, int>, vector<pair<string, int>>, ComparePairs> pq_freq = crear_cola_prio(map_freq);
     int nodo_actual = 0, indice = 0;
 
     for (auto& pareja : map_freq) {
-        // Incluimos el valor del mapa a la cola de prioridades
         nodos[nodo_actual] = new Node(pareja);
+        cout << "Se ha anadido: " << nodos[nodo_actual]->data.first << "," << nodos[nodo_actual]->data.second << " con indice: " << nodo_actual << endl; // para depurar
         nodo_actual++;
     }
 
@@ -114,22 +124,24 @@ Node* construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
 
     for(int i = 0; i < map_freq.size() - 1; i++){
 
-        par_1 = pq_freq.top();
-        pq_freq.pop();
+        if (!pq_freq.empty()){
+            par_1 = pq_freq.top();
+            pq_freq.pop();
 
-        par_2 = pq_freq.top();
-        pq_freq.pop();
+            par_2 = pq_freq.top();
+            pq_freq.pop();
+        }
 
         new_par.second = par_1.second + par_2.second;
 
         nodos[nodo_actual] = new Node(new_par);
+        cout << "Se ha anadido: " << nodos[nodo_actual]->data.first << "," << nodos[nodo_actual]->data.second << " con indice: " << nodo_actual << endl; // para depurar
         construir_nuevo_nodo(par_1, par_2, nodos, nodo_actual);
-        /*
+        
         cout << "---- Nodo actual: " << nodo_actual << " ----\n";
         print_arbol(nodos[nodo_actual], i+1);
         cout << "\n";
-        */
-
+    
         nodo_actual++;
 
         pq_freq.push(new_par);
@@ -203,14 +215,50 @@ void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, stri
 }
 
 
+void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codigos){
+    ifstream f_in;
+    ofstream f_out;
+    f_in.open(fichero);
+    if(!f_in.is_open()){
+        printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su lectura", fichero);
+    }
+    else{
 
-void comprimir(ifstream &fichero){
-    
+        // Para cambiar la extensión de fichero si es que tiene alguna.
+        cout << fichero << endl;
+        string delimiter = ".";
+        string token = fichero.substr(0, fichero.find_last_of(delimiter));
+        string fichero_out = token + ".huf";
+        // FALTA EL CASO DE QUE NO TENGA EXTENSIÓN ... ------------------------------------------------------------------------------
+
+        f_out.open(fichero_out);
+        if(!f_out.is_open()){
+            printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su escritura", fichero_out);
+        }
+        else{
+            char char_leido;
+            string string_leido;
+
+            while (f_in.get(char_leido)) {
+            string_leido = char_leido;
+            f_out << codigos[string_leido]; // Escribimos en el fichero a crear el caracter en su codificación correspondiente
+        }
+            f_out.close();
+        }
+        f_in.close();
+    }
+}
+
+
+
+void comprimir(string fichero){
+
     // Obtenemos la cola de prioridad de caracteres y su frecuencia de aparición
     unordered_map<string, int> frecuencia = contar_caracteres(fichero);
     int num_caracteres = frecuencia.size();
     int num_arboles = (num_caracteres * 2)-1;
 
+    // Creamos el árbol
     Node* nodos[num_arboles];
     construir_arbol(frecuencia, nodos);
 
@@ -218,7 +266,7 @@ void comprimir(ifstream &fichero){
     asignar_ceros_y_unos(arbol);
 
     
-    unordered_map<string, string> codigos;
+    unordered_map<string, string> codigos; // Contiene codificado los prefijos binarios para cada caracter
     asignar_codigos(arbol, num_caracteres, codigos);
 
     // PARA IMPRIMIR EL DICCIONARIO
@@ -229,15 +277,11 @@ void comprimir(ifstream &fichero){
     
 
     // escribir fichero (diccionario de codigos + el texto codificado)
-
-    // input = archivo original
-    // output = archivo .huf
-
-
+    escribirFicheroHuffman(fichero, codigos);
 }
 
 
-void descomprimir(ifstream &fichero){
+void descomprimir(string fichero){
     // leer diccionario de codigos
     // escribir fichero descodificado
 
@@ -260,24 +304,16 @@ int main(int argc, char *argv[]){
     } else {
         string nombreFichero = argv[2];
         string flag = argv[1];
-        ifstream fichero(nombreFichero); // Abre el fichero.
-
-        if (!fichero) { 
-            // Si ha habido un error al abrirlo, se informa al usuario y se cierra el programa.
-            cerr << "No se ha podido abrir el fichero \"" << nombreFichero << "\"." << endl;
-            exit(1);
-        }
 
         if (flag == "-c") {
-            comprimir(fichero);
+            comprimir(nombreFichero);
 
         } else if (flag == "-d") {
-            descomprimir(fichero);
+            descomprimir(nombreFichero);
 
         } else {
             cout << "FLAG INVALIDA";
 
         }
-        fichero.close();
     }
 }

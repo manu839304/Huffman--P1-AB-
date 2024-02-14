@@ -3,12 +3,12 @@
 int main()
 {
     pair<string, int> par, par2, par3;
-    par.first = 1;
-    par.second = 'a';
-    par2.first = 2;
-    par2.second = 'b';    
-    par3.first = 3;
-    par3.second = 'c';
+    par.first = "a";
+    par.second = 1;
+    par2.first = "b";
+    par2.second = 2;    
+    par3.first = "c";
+    par3.second = 3;
     
     struct Node* root = new Node(par);
     root->left = new Node(par2);//inserting 2 to the left of root
