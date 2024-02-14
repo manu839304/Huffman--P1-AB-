@@ -11,7 +11,7 @@ using namespace std;
 struct ComparePairs {
     bool operator()(const pair<string, int>& lhs, const pair<string, int>& rhs) {
         // Ordenar por el segundo elemento de cada par (int)
-        return lhs.second > rhs.second;
+        return lhs.second > rhs.second || ((lhs.second == rhs.second) && (lhs.first > lhs.first));
     }
 };
 

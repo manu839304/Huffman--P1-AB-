@@ -149,6 +149,7 @@ void asignar_ceros_y_unos(Node* arbol){
 
 }
 
+/*
 string recoger_codigo(Node* arbol, string* caracter){
     string codigo;
     int bit;
@@ -173,14 +174,31 @@ string recoger_codigo(Node* arbol, string* caracter){
         arbol = NULL;
     }
 }
+*/
+
+void asignar_codigos_subarbol(Node* arbol, string codigo, unordered_map<string, string>& codigos){
+    if(arbol->data.first != "NULL"){ // es un nodo hoja = nodo con caracter que introducir en el diccionario
+        codigos[arbol->data.first] = codigo;
+
+    } else {
+        if(arbol->left != NULL) {
+            asignar_codigos_subarbol(arbol->left, codigo + to_string(arbol->left->data.second), codigos);
+        }
+
+        if(arbol->right != NULL) {
+            asignar_codigos_subarbol(arbol->right, codigo + to_string(arbol->right->data.second), codigos);
+        }
+    }
+}
 
 
-void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, string> codigos){
-    string caracter, codigo;
-    cout << "Num caracteres: " << num_caracteres << "\n";
-    for(int i = 0; i < num_caracteres; i++){
-        codigo = recoger_codigo(arbol, &caracter);
-        cout << caracter << ":" << codigo << "\n";
+void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, string>& codigos){
+    if(arbol->left != NULL) {
+        asignar_codigos_subarbol(arbol->left, to_string(arbol->left->data.second), codigos);
+    }
+
+    if(arbol->right != NULL) {
+        asignar_codigos_subarbol(arbol->right, to_string(arbol->right->data.second), codigos);
     }
 }
 
@@ -199,10 +217,17 @@ void comprimir(ifstream &fichero){
     Node* arbol = nodos[num_arboles-1]; // le pasamos el ultimo nodo raiz, que corresponde al arbol 'final' (ultima iteracion)
     asignar_ceros_y_unos(arbol);
 
+    
     unordered_map<string, string> codigos;
     asignar_codigos(arbol, num_caracteres, codigos);
-    // Printtree(arbol, 0);
+
+    // PARA IMPRIMIR EL DICCIONARIO
+    for (auto& it : codigos) {
+        cout << it.first << ' '
+             << it.second << '\n';
+    }
     
+
     // escribir fichero (diccionario de codigos + el texto codificado)
 
     // input = archivo original
