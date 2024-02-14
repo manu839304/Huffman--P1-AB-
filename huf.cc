@@ -147,7 +147,7 @@ void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
         pq_freq.push(new_par);
     }
 }
-
+/*
 void asignar_ceros_y_unos(Node* arbol){
     if(arbol->left != NULL){
         arbol->left->data.second = 0;
@@ -160,6 +160,7 @@ void asignar_ceros_y_unos(Node* arbol){
     }
 
 }
+*/
 
 /*
 string recoger_codigo(Node* arbol, string* caracter){
@@ -194,11 +195,11 @@ void asignar_codigos_subarbol(Node* arbol, string codigo, unordered_map<string, 
 
     } else {
         if(arbol->left != NULL) {
-            asignar_codigos_subarbol(arbol->left, codigo + to_string(arbol->left->data.second), codigos);
+            asignar_codigos_subarbol(arbol->left, codigo + "0", codigos);
         }
 
         if(arbol->right != NULL) {
-            asignar_codigos_subarbol(arbol->right, codigo + to_string(arbol->right->data.second), codigos);
+            asignar_codigos_subarbol(arbol->right, codigo + "1", codigos);
         }
     }
 }
@@ -206,11 +207,11 @@ void asignar_codigos_subarbol(Node* arbol, string codigo, unordered_map<string, 
 
 void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, string>& codigos){
     if(arbol->left != NULL) {
-        asignar_codigos_subarbol(arbol->left, to_string(arbol->left->data.second), codigos);
+        asignar_codigos_subarbol(arbol->left, "0", codigos);
     }
 
     if(arbol->right != NULL) {
-        asignar_codigos_subarbol(arbol->right, to_string(arbol->right->data.second), codigos);
+        asignar_codigos_subarbol(arbol->right, "1", codigos);
     }
 }
 
@@ -263,7 +264,7 @@ void comprimir(string fichero){
     construir_arbol(frecuencia, nodos);
 
     Node* arbol = nodos[num_arboles-1]; // le pasamos el ultimo nodo raiz, que corresponde al arbol 'final' (ultima iteracion)
-    asignar_ceros_y_unos(arbol);
+    //asignar_ceros_y_unos(arbol);
 
     
     unordered_map<string, string> codigos; // Contiene codificado los prefijos binarios para cada caracter
@@ -277,7 +278,7 @@ void comprimir(string fichero){
     
 
     // escribir fichero (diccionario de codigos + el texto codificado)
-    escribirFicheroHuffman(fichero, codigos);
+    //escribirFicheroHuffman(fichero, codigos);
 }
 
 
