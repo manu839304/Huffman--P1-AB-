@@ -32,11 +32,12 @@ unordered_map<string, int> contar_caracteres(string fich) {
 
         // MOSTRAR FRECUENCIAS NO ORDENADAS
         /*
-        for (auto& it : frecuencia) {
+        for (auto& it : map_freq) {
             cout << it.first << ' '
                 << it.second << '\n';
         }
         */
+        
 
         fichero.close();
     }
@@ -120,16 +121,19 @@ void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
 
     pair<string,int> par_1, par_2, new_par;
 
-    new_par.first = "NULL";
-
     for(int i = 0; i < map_freq.size() - 1; i++){
 
         if (!pq_freq.empty()){
             par_1 = pq_freq.top();
             pq_freq.pop();
+            cout << "Se ha sacado: " << par_1.first << "," << par_1.second << " de la cola prio" << endl; // para depurar
+
 
             par_2 = pq_freq.top();
             pq_freq.pop();
+            cout << "Se ha sacado: " << par_2.first << "," << par_2.second << " de la cola prio" << endl; // para depurar
+            
+            new_par.first = par_1.first + "+" + par_2.first;
         }
 
         new_par.second = par_1.second + par_2.second;
@@ -190,7 +194,7 @@ string recoger_codigo(Node* arbol, string* caracter){
 */
 
 void asignar_codigos_subarbol(Node* arbol, string codigo, unordered_map<string, string>& codigos){
-    if(arbol->data.first != "NULL"){ // es un nodo hoja = nodo con caracter que introducir en el diccionario
+    if(arbol->data.first.size() == 1){ // es un nodo hoja = nodo con caracter que introducir en el diccionario
         codigos[arbol->data.first] = codigo;
 
     } else {
