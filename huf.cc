@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <cstdio>     // Para printf
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "arbol.hh"
 
@@ -248,7 +249,7 @@ void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codig
             
             for (auto& it : codigos) { // Escribimos el diccionario en el fichero de salida (char:codificacion)
                 f_out << it.first << ':'
-                      << it.second << ' ';
+                      << it.second << ';';
             }
             f_out << endl;
 
@@ -299,10 +300,76 @@ void comprimir(string fichero){
     escribirFicheroHuffman(fichero, codigos);
 }
 
+// Procedimiento para construir el diccionario de decodificación.
+void obtenerDiccionario(ifstream& fich_compr, unordered_map<string, string>& decod){
+    string linea_leida;
+    getline(fich_compr, linea_leida); // Obtengo la linea que contiene la codificación del diccionario
+
+    // Parseo la linea
+    stringstream ss(linea_leida); // Cadena como stream de lectura
+    string token;
+
+    while (getline(ss, token, ';')) { // Parseo cada par caracter:codificacion
+        stringstream ss_token(token);
+        string caracter, codificacion;
+
+        // Parseo para obtener cada string del par
+        if (getline(ss_token, caracter, ':') &&
+            getline(ss_token, codificacion, ':')) {
+            decod[codificacion] = caracter;
+        }
+    }
+}
+
+// Devuelve un string con el nobmre del fichero y su extensión original.
+string obtenerNombreFichDecod(ifstream& fich_compr){
+    string nombre_fich;
+    getline(fich_compr, nombre_fich);
+    return nombre_fich;
+}
+
+// Procedimiento para crear un fichero 
+void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& decod, string nombreFichDecod){
+    ofstream f_out;
+    f_out.open(nombreFichDecod);
+    if(!f_out.is_open()){
+        printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su escritura", nombreFichDecod);
+    }
+    else{
+        char char_leido;
+        string string_leido;
+        string cadena_codif = ""; // Se iran concatenado caracteres hasta lograr coincidencia en el diccionario
+
+        while (f_in.get(char_leido)) {
+            string_leido = char_leido;
+            if(string_leido == "\n"){
+                f_out << endl;
+            }
+            else{
+                // Comprobamos si esta codificado
+                
+            }
+        }
+        f_out.close();
+    }
+}
 
 void descomprimir(string fichero){
 
-    unordered_map<string, string> decod // clave: codificacion binaria; valor: caracter
+    unordered_map<string, string> decod; // clave: codificacion binaria; valor: caracter
+    ifstream f_in; // Fichero comrpimido
+    ofstream f_out; // Fichero descomprimido
+
+    f_in.open(fichero);
+    if(!f_in.is_open()){
+        printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su lectura", fichero);
+    }
+    else{
+        string fich_decod = obtenerNombreFichDecod(f_in);
+        obtenerDiccionario(f_in, decod);
+        escribirFicheroOriginal(f_in, decod, fich_decod);
+        f_in.close();
+    }
 
     // leer diccionario de codigos
     // escribir fichero descodificado
