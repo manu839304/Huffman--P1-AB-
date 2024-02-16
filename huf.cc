@@ -338,16 +338,26 @@ void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& deco
     else{
         char char_leido;
         string string_leido;
-        string cadena_codif = ""; // Se iran concatenado caracteres hasta lograr coincidencia en el diccionario
+        string cadena_codif = ""; // Se irán concatenado caracteres hasta lograr coincidencia en el diccionario
 
         while (f_in.get(char_leido)) {
             string_leido = char_leido;
+
             if(string_leido == "\n"){
                 f_out << endl;
             }
             else{
+                cadena_codif += string_leido;
+
                 // Comprobamos si esta codificado
-                
+                auto it = decod.find(cadena_codif);
+                if(it != decod.end()){ // Si la clave fue encontrada:
+                    f_out << decod[cadena_codif];
+                    cadena_codif = ""; // Reseteamos para la siguiente lectura
+                }
+                // Si la clave no se encuentra, no se resetea la cadena "cadena_codif"
+                // para que en la siguiente iteración se concatene con el siguiente 
+                // caracter y se realice la búsqueda en el diccionario con el resultado.
             }
         }
         f_out.close();
@@ -370,23 +380,9 @@ void descomprimir(string fichero){
         escribirFicheroOriginal(f_in, decod, fich_decod);
         f_in.close();
     }
-
-    // leer diccionario de codigos
-    // escribir fichero descodificado
-
-    // input = archivo .huf
-    // output = archivo original
-
-
 }
 
-// extension archivo original
-// string con el diccionario
-// texto
-
 int main(int argc, char *argv[]){
-
-
     if (argc != 3){
         cout << "NUMERO DE PARAMETROS INVALIDO";
     
