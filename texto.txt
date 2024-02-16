@@ -1,1 +1,4 @@
-AAAABBBCCD
+Esta es la primera linea
+Esta es la segunda linea
+
+Esta es la cuarta y ultima linea.

@@ -243,11 +243,24 @@ void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codig
         else{
             char char_leido;
             string string_leido;
+            
+            f_out << fichero << endl; // Escribimos el nombre del fichero para guardarnos la extensión
+            
+            for (auto& it : codigos) { // Escribimos el diccionario en el fichero de salida (char:codificacion)
+                f_out << it.first << ':'
+                      << it.second << ' ';
+            }
+            f_out << endl;
 
             while (f_in.get(char_leido)) {
-            string_leido = char_leido;
-            f_out << codigos[string_leido]; // Escribimos en el fichero a crear el caracter en su codificación correspondiente
-        }
+                string_leido = char_leido;
+                if(string_leido == "\n"){
+                    f_out << endl;
+                }
+                else{
+                    f_out << codigos[string_leido]; // Escribimos en el fichero a crear el caracter en su codificación correspondiente
+                }
+            }
             f_out.close();
         }
         f_in.close();
@@ -275,11 +288,12 @@ void comprimir(string fichero){
     asignar_codigos(arbol, num_caracteres, codigos);
 
     // PARA IMPRIMIR EL DICCIONARIO
+    /*
     for (auto& it : codigos) {
         cout << it.first << ' '
              << it.second << '\n';
     }
-    
+    */
 
     // escribir fichero (diccionario de codigos + el texto codificado)
     escribirFicheroHuffman(fichero, codigos);
@@ -287,6 +301,9 @@ void comprimir(string fichero){
 
 
 void descomprimir(string fichero){
+
+    unordered_map<string, string> decod // clave: codificacion binaria; valor: caracter
+
     // leer diccionario de codigos
     // escribir fichero descodificado
 
