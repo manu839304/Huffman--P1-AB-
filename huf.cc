@@ -302,22 +302,18 @@ void comprimir(string fichero){
 
 // Procedimiento para construir el diccionario de decodificación.
 void obtenerDiccionario(ifstream& fich_compr, unordered_map<string, string>& decod){
-    string linea_leida;
+    string linea_leida, caracter, caracter_cod;
+    char char_leido;
     getline(fich_compr, linea_leida); // Obtengo la linea que contiene la codificación del diccionario
 
     // Parseo la linea
     stringstream ss(linea_leida); // Cadena como stream de lectura
-    string token;
 
-    while (getline(ss, token, ';')) { // Parseo cada par caracter:codificacion
-        stringstream ss_token(token);
-        string caracter, codificacion;
-
-        // Parseo para obtener cada string del par
-        if (getline(ss_token, caracter, ':') &&
-            getline(ss_token, codificacion, ':')) {
-            decod[codificacion] = caracter;
-        }
+    while(ss.get(char_leido)){
+        caracter = char_leido;
+        ss.get(char_leido); // Se lee el separador
+        getline(ss, caracter_cod, ';');
+        decod[caracter_cod] = caracter; // Se guarda en el diccionario
     }
 }
 
@@ -398,7 +394,6 @@ int main(int argc, char *argv[]){
 
         } else {
             cout << "FLAG INVALIDA";
-
         }
     }
 }
