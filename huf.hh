@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <queue>
+#include "arbol.hh"
 
 using namespace std;
 
@@ -15,10 +16,31 @@ struct ComparePairs {
     }
 };
 
-void comprimir(ifstream &fichero);
-
-unordered_map<string, int> contar_caracteres(ifstream &fichero);
+unordered_map<string, int> contar_caracteres(string fich);
 
 priority_queue<pair<string, int>, vector<pair<string, int> >, ComparePairs> crear_cola_prio(unordered_map<string, int> map_freq);
 
-void descomprimir(ifstream &fichero);
+int encontrar_indice_nodo(pair<string, int> pareja, Node* nodos[], int ultimo_nodo);
+
+void construir_nuevo_nodo(pair<string, int> par_izq, pair<string, int> par_dch, Node* nodos[], int indice_raiz);
+
+void print_arbol(Node* nodo, int num_it);
+
+void asignar_codigos_subarbol(Node* arbol, string codigo, unordered_map<string, string>& codigos);
+
+void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, string>& codigos);
+
+void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codigos);
+
+void comprimir(string fichero);
+
+void obtenerDiccionario(ifstream& fich_compr, unordered_map<string, string>& decod);
+
+string obtenerNombreFichDecod(ifstream& fich_compr);
+
+void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& decod, string nombreFichDecod);
+
+void descomprimir(string fichero);
+
+
+

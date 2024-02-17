@@ -4,7 +4,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "arbol.hh"
 
 using namespace std;
 
@@ -50,7 +49,6 @@ unordered_map<string, int> contar_caracteres(string fich) {
     }
     return map_freq;
 }
-
 
 priority_queue<pair<string, int>, vector<pair<string, int> >, ComparePairs> crear_cola_prio(unordered_map<string, int> map_freq){
     // Declaramos cola de prioridades
@@ -111,7 +109,6 @@ void print_arbol(Node* nodo, int num_it){
     cout << "--- ITERACION " << num_it << " ---\n";
     Printtree(nodo, 0);
 }
-
 
 void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
 
@@ -214,7 +211,6 @@ void asignar_codigos_subarbol(Node* arbol, string codigo, unordered_map<string, 
     }
 }
 
-
 void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, string>& codigos){
     if(arbol->left != NULL) {
         asignar_codigos_subarbol(arbol->left, "0", codigos);
@@ -224,7 +220,6 @@ void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, stri
         asignar_codigos_subarbol(arbol->right, "1", codigos);
     }
 }
-
 
 void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codigos){
     ifstream f_in;
@@ -273,8 +268,6 @@ void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codig
         f_in.close();
     }
 }
-
-
 
 void comprimir(string fichero){
 
@@ -330,7 +323,7 @@ string obtenerNombreFichDecod(ifstream& fich_compr){
     return nombre_fich;
 }
 
-// Procedimiento para crear un fichero 
+// Procedimiento para volver a construir el fichero original que se comprimió
 void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& decod, string nombreFichDecod){
     ofstream f_out;
     f_out.open(nombreFichDecod);
