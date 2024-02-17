@@ -18,6 +18,7 @@ unordered_map<string, int> contar_caracteres(string fich) {
     string string_leido;
 
     if(fichero.is_open()){
+        fichero.ignore(1, 0x1A);
         while (fichero.get(char_leido)) {
             string_leido = char_leido;
             if (string_leido != "\n"){ // Evitará codificar el salto de linea
@@ -44,7 +45,8 @@ unordered_map<string, int> contar_caracteres(string fich) {
         fichero.close();
     }
     else{
-        printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su lectura", fich);
+        cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fich << "\" para su lectura";
+        exit(1);
     }
     return map_freq;
 }
@@ -89,6 +91,7 @@ void construir_nuevo_nodo(pair<string, int> par_izq, pair<string, int> par_dch, 
     int indice_hijo = encontrar_indice_nodo(par_izq, nodos, indice_raiz);
     if(indice_hijo < 0){
         cout << "ERROR: Nodo <" << par_izq.first << "," << par_izq.second << "> no encontrado.\n";
+        exit(1);
     } else {
         nodos[indice_raiz]->left = nodos[indice_hijo];
         //cout << "Hijo izquierdo de " << nodos[indice_raiz]->data.first << "," << par_izq.second << "> no encontrado."
@@ -98,6 +101,7 @@ void construir_nuevo_nodo(pair<string, int> par_izq, pair<string, int> par_dch, 
     indice_hijo = encontrar_indice_nodo(par_dch, nodos, indice_raiz);
     if(indice_hijo < 0){
         cout << "ERROR: Nodo <" << par_dch.first << "," << par_dch.second << "> no encontrado.";
+        exit(1);
     } else {
         nodos[indice_raiz]->right = nodos[indice_hijo];
     }
@@ -227,7 +231,8 @@ void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codig
     ofstream f_out;
     f_in.open(fichero);
     if(!f_in.is_open()){
-        printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su lectura", fichero);
+        cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fichero << "\" para su lectura";
+        exit(1);
     }
     else{
 
@@ -239,7 +244,8 @@ void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codig
 
         f_out.open(fichero_out);
         if(!f_out.is_open()){
-            printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su escritura", fichero_out);
+            cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fichero_out << "\" para su lectura";
+            exit(1);
         }
         else{
             char char_leido;
@@ -329,7 +335,8 @@ void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& deco
     ofstream f_out;
     f_out.open(nombreFichDecod);
     if(!f_out.is_open()){
-        printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su escritura", nombreFichDecod);
+        cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << nombreFichDecod << "\" para su lectura";
+        exit(1);
     }
     else{
         char char_leido;
@@ -368,7 +375,8 @@ void descomprimir(string fichero){
 
     f_in.open(fichero);
     if(!f_in.is_open()){
-        printf("ERROR: No se ha podido abrir el fichero con nombre: \"%s\" para su lectura", fichero);
+        cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fichero << "\" para su lectura";
+        exit(1);
     }
     else{
         string fich_decod = obtenerNombreFichDecod(f_in);
