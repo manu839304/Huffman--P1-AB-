@@ -30,15 +30,15 @@ void asignar_codigos_subarbol(Node* arbol, string codigo, unordered_map<string, 
 
 void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, string>& codigos);
 
-void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codigos);
+void escribir_fichero_huffman(string fichero, unordered_map<string, string>& codigos);
 
 void comprimir(string fichero);
 
-void obtenerDiccionario(ifstream& fich_compr, unordered_map<string, string>& decod);
+void obtener_diccionario(ifstream& fich_compr, unordered_map<string, string>& decod);
 
-string obtenerNombreFichDecod(ifstream& fich_compr);
+string obtener_nombre_fich_decod(ifstream& fich_compr);
 
-void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& decod, string nombreFichDecod);
+void escribir_fichero_original(ifstream& f_in, unordered_map<string, string>& decod, string nombre_fich_decod);
 
 void descomprimir(string fichero);
 

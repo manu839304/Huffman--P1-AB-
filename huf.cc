@@ -221,7 +221,7 @@ void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, stri
     }
 }
 
-void escribirFicheroHuffman(string fichero, unordered_map<string, string>& codigos){
+void escribir_fichero_huffman(string fichero, unordered_map<string, string>& codigos){
     ifstream f_in;
     ofstream f_out;
     f_in.open(fichero);
@@ -296,11 +296,11 @@ void comprimir(string fichero){
     */
 
     // escribir fichero (diccionario de codigos + el texto codificado)
-    escribirFicheroHuffman(fichero, codigos);
+    escribir_fichero_huffman(fichero, codigos);
 }
 
 // Procedimiento para construir el diccionario de decodificación.
-void obtenerDiccionario(ifstream& fich_compr, unordered_map<string, string>& decod){
+void obtener_diccionario(ifstream& fich_compr, unordered_map<string, string>& diccionario_decod){
     string linea_leida, caracter, caracter_cod;
     char char_leido;
     getline(fich_compr, linea_leida); // Obtengo la linea que contiene la codificación del diccionario
@@ -312,23 +312,23 @@ void obtenerDiccionario(ifstream& fich_compr, unordered_map<string, string>& dec
         caracter = char_leido;
         ss.get(char_leido); // Se lee el separador
         getline(ss, caracter_cod, ';');
-        decod[caracter_cod] = caracter; // Se guarda en el diccionario
+        diccionario_decod[caracter_cod] = caracter; // Se guarda en el diccionario
     }
 }
 
 // Devuelve un string con el nobmre del fichero y su extensión original.
-string obtenerNombreFichDecod(ifstream& fich_compr){
+string obtener_nombre_fich_decod(ifstream& fich_compr){
     string nombre_fich;
     getline(fich_compr, nombre_fich);
     return nombre_fich;
 }
 
 // Procedimiento para volver a construir el fichero original que se comprimió
-void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& decod, string nombreFichDecod){
+void escribir_fichero_original(ifstream& f_in, unordered_map<string, string>& diccionario_decod, string nombre_fich_decod){
     ofstream f_out;
-    f_out.open(nombreFichDecod);
+    f_out.open(nombre_fich_decod);
     if(!f_out.is_open()){
-        cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << nombreFichDecod << "\" para su lectura";
+        cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << nombre_fich_decod << "\" para su lectura";
         exit(1);
     }
     else{
@@ -346,9 +346,9 @@ void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& deco
                 cadena_codif += string_leido;
 
                 // Comprobamos si esta codificado
-                auto it = decod.find(cadena_codif);
-                if(it != decod.end()){ // Si la clave fue encontrada:
-                    f_out << decod[cadena_codif];
+                auto it = diccionario_decod.find(cadena_codif);
+                if(it != diccionario_decod.end()){ // Si la clave fue encontrada:
+                    f_out << diccionario_decod[cadena_codif];
                     cadena_codif = ""; // Reseteamos para la siguiente lectura
                 }
                 // Si la clave no se encuentra, no se resetea la cadena "cadena_codif"
@@ -360,21 +360,21 @@ void escribirFicheroOriginal(ifstream& f_in, unordered_map<string, string>& deco
     }
 }
 
-void descomprimir(string fichero){
+void descomprimir(string fichero_huf){
 
-    unordered_map<string, string> decod; // clave: codificacion binaria; valor: caracter
+    unordered_map<string, string> diccionario_decod; // clave: codificacion binaria; valor: caracter
     ifstream f_in; // Fichero comrpimido
     ofstream f_out; // Fichero descomprimido
 
-    f_in.open(fichero);
+    f_in.open(fichero_huf);
     if(!f_in.is_open()){
-        cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fichero << "\" para su lectura";
+        cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fichero_huf << "\" para su lectura";
         exit(1);
     }
     else{
-        string fich_decod = obtenerNombreFichDecod(f_in);
-        obtenerDiccionario(f_in, decod);
-        escribirFicheroOriginal(f_in, decod, fich_decod);
+        string fichero_decod = obtener_nombre_fich_decod(f_in);
+        obtener_diccionario(f_in, diccionario_decod);
+        escribir_fichero_original(f_in, diccionario_decod, fichero_decod);
         f_in.close();
     }
 }
@@ -384,14 +384,14 @@ int main(int argc, char *argv[]){
         cout << "NUMERO DE PARAMETROS INVALIDO";
     
     } else {
-        string nombreFichero = argv[2];
+        string nombre_fichero = argv[2];
         string flag = argv[1];
 
         if (flag == "-c") {
-            comprimir(nombreFichero);
+            comprimir(nombre_fichero);
 
         } else if (flag == "-d") {
-            descomprimir(nombreFichero);
+            descomprimir(nombre_fichero);
 
         } else {
             cout << "FLAG INVALIDA";
