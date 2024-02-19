@@ -1,0 +1,76 @@
+El directorio se encuentra organizado con la siguiente estructura:
+
+----------------------------------------------------------------------------
+
++ prac1
+	+ archivos_de_prueba
+		- binario.bin
+		- texto.txt
+		- texto2.txt
+	- arbol.cc
+	- arbol.hh
+	- huf.cc
+	- huf.hh
+	- ejecutar.sh
+	- LEEME.txt
+
+----------------------------------------------------------------------------
+
+La carpeta "archivos_de_prueba deberá contener los diferentes ficheros en formato .txt o .bin
+para realizar y probar su codificación.
+
+"arbol.cc" y "arbol.hh" es la librería utilizada para un manejo más fácil de árboles en C++
+
+"huf.cc" y "huf.hh" es el programa realizado como tarea para compresión y descompresión de 
+archivos mediante el algoritmo de Hufman.
+
+"ejecutar.sh" es un script para realizar prubas y verificar el correcto funcionamiento del
+programa.
+
+########################## REALIZACIÓN DE PRUEBAS ########################## 
+
+Para realizar las pruebas, se deberá ejecutar el script "ejectuar.sh". Es recomendable 
+ejecutarlo con el flag "-d" para que indique los pasos realizados dentro de él.
+
+Dicho script se encarga de lo siguiente:
+
+	- Elimina residuos de anteriores ejecuciones (carpeta "decodificados" y 
+	  "codificados" generadas, y el ejecutable)
+	- Vuelve a compilar y generar el ejecutable del programa (huf.exe)
+	- Copia los ficheros de prueba en una nueva carpeta "decodificados" para 
+	  aplicar en ellos el algoritmo de compresión. 
+	- Los ficheros comprimidos se copian en otra nueva carpeta llamada "codificados"
+	  para guardarlos y poder ver el contenido de los ficheros codificados.
+	- Para los ficheros codificados de la carpeta "decodificados", se aplica de nuevo el
+	  algoritmo de decodificación para obtener los originales.
+	- El script finaliza comparando los ficheros originales de la carpeta "archivos_de_prueba"
+	  con los ficheros revertidos a su forma original de la carpeta "decodificados" indicando
+	  si su contenido concuerda.
+
+Una vez ejecutado el script debería quedar la siguiente estructura del directrio "prac1":
+
+----------------------------------------------------------------------------
+
++ prac1
+	+ archivos_de_prueba
+		- binario.bin
+		- texto.txt
+		- texto2.txt
+	+ codificados
+		- binario.huf
+		- texto.huf
+		- texto2.huf
+	+ decodificados
+		- binario.bin
+		- texto.txt
+		- texto2.txt
+	- arbol.cc
+	- arbol.hh
+	- huf.cc
+	- huf.hh
+	- huf.exe
+	- ejecutar.sh
+	- LEEME.txt
+
+----------------------------------------------------------------------------
+
