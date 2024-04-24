@@ -1,5 +1,6 @@
 #include "huf.hh"
 #include <stdlib.h>
+#include <chrono>
 #include <cstdio>     // Para printf
 #include <iostream>
 #include <sstream>
@@ -58,20 +59,7 @@ priority_queue<pair<string, int>, vector<pair<string, int> >, ComparePairs> crea
         // Inlcuimos el valor del mapa a la cola de prioridades
         pq_freq.push(pareja);
     }
-    
-    //MOSTRAR COLA PRIORIDADES
-    /*
-    pair<char,int> p;
 
-    for (int i = 0; i < map_freq.size(); i++){
-        p = pq_freq.top();
-        pq_freq.pop();
-
-        printf("%c", p.first);
-    }
-    
-    printf("\n");
-    */
    return pq_freq;
 }
 
@@ -154,47 +142,7 @@ void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
         pq_freq.push(new_par);
     }
 }
-/*
-void asignar_ceros_y_unos(Node* arbol){
-    if(arbol->left != NULL){
-        arbol->left->data.second = 0;
-        asignar_ceros_y_unos(arbol->left);
-    }
 
-    if(arbol->right != NULL){
-        arbol->right->data.second = 1;
-        asignar_ceros_y_unos(arbol->right);
-    }
-
-}
-*/
-
-/*
-string recoger_codigo(Node* arbol, string* caracter){
-    string codigo;
-    int bit;
-    cout << "Nodo: " << arbol->data.first << "," << arbol->data.second << "\n";
-    
-
-    if(arbol->data.first != "NULL"){
-        *caracter = arbol->data.first;
-        cout << "ANULADO " << *caracter << "\n";
-        arbol = NULL;
-        return codigo;
-
-    } else if(arbol->left != NULL){
-        codigo += arbol->left->data.second + '0';
-        codigo += recoger_codigo(arbol->left, caracter);
-        cout << "Codigo: " << codigo << "\n";
-    } else if (arbol->right != NULL) {
-        codigo += arbol->right->data.second + '0';
-        codigo += recoger_codigo(arbol->right, caracter);
-        cout << "Codigo: " << codigo << "\n";
-    } else {
-        arbol = NULL;
-    }
-}
-*/
 
 void asignar_codigos_subarbol(Node* arbol, string codigo, unordered_map<string, string>& codigos){
     if(arbol->data.first.size() == 1){ // es un nodo hoja = nodo con caracter que introducir en el diccionario
@@ -388,7 +336,11 @@ int main(int argc, char *argv[]){
         string flag = argv[1];
 
         if (flag == "-c") {
+            auto start_time = chrono::high_resolution_clock::now();
             comprimir(nombre_fichero);
+            auto end_time = chrono::high_resolution_clock::now();
+            double duracion_ms = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count() / 1000000.0;
+            cout << "Duracion de la compresion: " << duracion_ms << " ms" << endl;
 
         } else if (flag == "-d") {
             descomprimir(nombre_fichero);
