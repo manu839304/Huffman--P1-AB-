@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <bitset>
 
 using namespace std;
 
@@ -33,14 +34,6 @@ unordered_map<string, int> contar_caracteres(string fich) {
                 }
             }
         }
-        // MOSTRAR FRECUENCIAS NO ORDENADAS
-        /*
-        for (auto& it : map_freq) {
-            cout << it.first << ' '
-                << it.second << '\n';
-        }
-        */
-        
 
         fichero.close();
     }
@@ -128,17 +121,9 @@ void construir_arbol(unordered_map<string, int> map_freq, Node* nodos[]){
         }
 
         new_par.second = par_1.second + par_2.second;
-
         nodos[nodo_actual] = new Node(new_par);
-        //cout << "Se ha anadido: " << nodos[nodo_actual]->data.first << "," << nodos[nodo_actual]->data.second << " con indice: " << nodo_actual << endl; // para depurar
         construir_nuevo_nodo(par_1, par_2, nodos, nodo_actual);
-        /*
-        cout << "---- Nodo actual: " << nodo_actual << " ----\n";
-        print_arbol(nodos[nodo_actual], i+1);
-        cout << "\n";
-        */
         nodo_actual++;
-
         pq_freq.push(new_par);
     }
 }
@@ -169,53 +154,68 @@ void asignar_codigos(Node* arbol, int num_caracteres, unordered_map<string, stri
     }
 }
 
-void escribir_fichero_huffman(string fichero, unordered_map<string, string>& codigos){
+void escribir_fichero_huffman(string fichero, unordered_map<string, string>& codigos) {
     ifstream f_in;
     ofstream f_out;
-    f_in.open(fichero);
-    if(!f_in.is_open()){
+    f_in.open(fichero, ios::binary);
+    if (!f_in.is_open()) {
         cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fichero << "\" para su lectura";
         exit(1);
-    }
-    else{
-
-        // Para cambiar la extensión de fichero si es que tiene alguna.
+    } else {
         string delimiter = ".";
         string token = fichero.substr(0, fichero.find_last_of(delimiter));
         string fichero_out = token + ".huf";
-        // FALTA EL CASO DE QUE NO TENGA EXTENSIÓN ... ------------------------------------------------------------------------------
 
-        f_out.open(fichero_out);
-        if(!f_out.is_open()){
+        f_out.open(fichero_out, ios::binary);
+        if (!f_out.is_open()) {
             cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fichero_out << "\" para su lectura";
             exit(1);
-        }
-        else{
+        } else {
             char char_leido;
             string string_leido;
-            
-            f_out << fichero << endl; // Escribimos el nombre del fichero para guardarnos la extensión
-            
-            for (auto& it : codigos) { // Escribimos el diccionario en el fichero de salida (char:codificacion)
-                f_out << it.first << ':'
-                      << it.second << ';';
-            }
-            f_out << endl;
 
+            // Escribir el nombre del fichero original para la extensión
+            f_out << fichero << '\n';
+
+            // Escribir el diccionario
+            for (auto& it : codigos) {
+                f_out << it.first << ':' << it.second << ';';
+            }
+            f_out << '\n';
+
+            // Acumular bits en un string
+            string bit_buffer;
             while (f_in.get(char_leido)) {
                 string_leido = char_leido;
-                if(string_leido == "\n"){
-                    f_out << endl;
+                if (string_leido == "\n") {
+                    bit_buffer += codigos["\n"];
+                } else {
+                    bit_buffer += codigos[string_leido];
                 }
-                else{
-                    f_out << codigos[string_leido]; // Escribimos en el fichero a crear el caracter en su codificación correspondiente
+
+                // Convertir los bits a bytes y escribirlos
+                while (bit_buffer.size() >= 8) {
+                    bitset<8> bits(bit_buffer.substr(0, 8));
+                    f_out.put(static_cast<unsigned char>(bits.to_ulong()));
+                    bit_buffer = bit_buffer.substr(8);
                 }
             }
+
+            // Si quedan bits residuales, rellenar con ceros y escribir
+            if (!bit_buffer.empty()) {
+                while (bit_buffer.size() < 8) {
+                    bit_buffer += '0';
+                }
+                bitset<8> bits(bit_buffer);
+                f_out.put(static_cast<unsigned char>(bits.to_ulong()));
+            }
+
             f_out.close();
         }
         f_in.close();
     }
 }
+
 
 void comprimir(string fichero){
 
@@ -235,20 +235,12 @@ void comprimir(string fichero){
     unordered_map<string, string> codigos; // Contiene codificado los prefijos binarios para cada caracter
     asignar_codigos(arbol, num_caracteres, codigos);
 
-    // PARA IMPRIMIR EL DICCIONARIO
-    /*
-    for (auto& it : codigos) {
-        cout << it.first << ' '
-             << it.second << '\n';
-    }
-    */
-
     // escribir fichero (diccionario de codigos + el texto codificado)
     escribir_fichero_huffman(fichero, codigos);
 }
 
 // Procedimiento para construir el diccionario de decodificación.
-void obtener_diccionario(ifstream& fich_compr, unordered_map<string, string>& diccionario_decod){
+void obtener_diccionario(ifstream& fich_compr, unordered_map<string, string>& diccionario_decod) {
     string linea_leida, caracter, caracter_cod;
     char char_leido;
     getline(fich_compr, linea_leida); // Obtengo la linea que contiene la codificación del diccionario
@@ -256,13 +248,14 @@ void obtener_diccionario(ifstream& fich_compr, unordered_map<string, string>& di
     // Parseo la linea
     stringstream ss(linea_leida); // Cadena como stream de lectura
 
-    while(ss.get(char_leido)){
+    while (ss.get(char_leido)) {
         caracter = char_leido;
         ss.get(char_leido); // Se lee el separador
         getline(ss, caracter_cod, ';');
         diccionario_decod[caracter_cod] = caracter; // Se guarda en el diccionario
     }
 }
+
 
 // Devuelve un string con el nobmre del fichero y su extensión original.
 string obtener_nombre_fich_decod(ifstream& fich_compr){
@@ -272,60 +265,59 @@ string obtener_nombre_fich_decod(ifstream& fich_compr){
 }
 
 // Procedimiento para volver a construir el fichero original que se comprimió
-void escribir_fichero_original(ifstream& f_in, unordered_map<string, string>& diccionario_decod, string nombre_fich_decod){
+void escribir_fichero_original(ifstream& f_in, unordered_map<string, string>& diccionario_decod, string nombre_fich_decod) {
     ofstream f_out;
     f_out.open(nombre_fich_decod);
-    if(!f_out.is_open()){
+    if (!f_out.is_open()) {
         cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << nombre_fich_decod << "\" para su lectura";
         exit(1);
-    }
-    else{
+    } else {
         char char_leido;
-        string string_leido;
-        string cadena_codif = ""; // Se irán concatenado caracteres hasta lograr coincidencia en el diccionario
+        string bit_buffer, cadena_codif;
 
+        // Leer el contenido binario y convertirlo a una cadena de bits
         while (f_in.get(char_leido)) {
-            string_leido = char_leido;
+            bitset<8> bits(static_cast<unsigned char>(char_leido));
+            bit_buffer += bits.to_string();
+        }
 
-            if(string_leido == "\n"){
-                f_out << endl;
-            }
-            else{
-                cadena_codif += string_leido;
-
-                // Comprobamos si esta codificado
-                auto it = diccionario_decod.find(cadena_codif);
-                if(it != diccionario_decod.end()){ // Si la clave fue encontrada:
-                    f_out << diccionario_decod[cadena_codif];
-                    cadena_codif = ""; // Reseteamos para la siguiente lectura
+        // Decodificar usando el diccionario
+        for (char& bit : bit_buffer) {
+            cadena_codif += bit;
+            if (diccionario_decod.find(cadena_codif) != diccionario_decod.end()) {
+                string decoded_char = diccionario_decod[cadena_codif];
+                if (decoded_char == "\n") {
+                    f_out << '\n';
+                } else {
+                    f_out << decoded_char;
                 }
-                // Si la clave no se encuentra, no se resetea la cadena "cadena_codif"
-                // para que en la siguiente iteración se concatene con el siguiente 
-                // caracter y se realice la búsqueda en el diccionario con el resultado.
+                cadena_codif = "";
             }
         }
         f_out.close();
     }
 }
 
-void descomprimir(string fichero_huf){
 
+
+void descomprimir(string fichero_huf) {
     unordered_map<string, string> diccionario_decod; // clave: codificacion binaria; valor: caracter
-    ifstream f_in; // Fichero comrpimido
+    ifstream f_in; // Fichero comprimido
     ofstream f_out; // Fichero descomprimido
 
-    f_in.open(fichero_huf);
-    if(!f_in.is_open()){
+    f_in.open(fichero_huf, ios::binary);
+    if (!f_in.is_open()) {
         cout << "ERROR: No se ha podido abrir el fichero con nombre \"" << fichero_huf << "\" para su lectura";
         exit(1);
-    }
-    else{
+    } else {
         string fichero_decod = obtener_nombre_fich_decod(f_in);
         obtener_diccionario(f_in, diccionario_decod);
         escribir_fichero_original(f_in, diccionario_decod, fichero_decod);
         f_in.close();
     }
 }
+
+
 
 int main(int argc, char *argv[]){
     if (argc != 3){
